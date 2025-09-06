@@ -26,10 +26,9 @@ const SearchBar = () => {
     try {
       setLoading(true);
       const [storiesResponse, usersResponse] = await Promise.all([
-        api.get(`/stories?search=${query}`),
-        api.get(`/users?search=${query}`)
+        api.get(`/stories/search`, { params: { search: query } }),
+        api.get(`/users/search`, { params: { search: query } })
       ]);
-
       const searchResults = [
         ...storiesResponse.data.map(story => ({ ...story, type: 'story' })),
         ...usersResponse.data.map(user => ({ ...user, type: 'user' }))
@@ -49,7 +48,7 @@ const SearchBar = () => {
     if (result.type === 'story') {
       navigate(`/story/${result.id}`);
     } else if (result.type === 'user') {
-      navigate(`/profile/${result.username}`);
+      navigate(`/profile/${result.id}`);
     }
     setQuery('');
     setShowResults(false);

@@ -681,7 +681,11 @@
 
 .story-description h3, .rating-section h3, .chapters-section h3, .author-works h3 {
   margin-bottom: var(--spacing-lg);
-  color: var(--text-primary);
+  color: gray;
+}
+
+.author-works p {
+  color: gray
 }
 
 .star-rating {
@@ -1411,4 +1415,37 @@ input:checked + .toggle-slider::before {
   .reading-tabs .tab {
     padding: var(--spacing-sm) var(--spacing-md);
   }
+}
+
+.page-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  color: rgb(27, 26, 26);
+  font-family: var(--font-family, Arial, sans-serif);
+}
+
+.page-container h1 {
+  font-size: var(--font-size-3xl);
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.page-container p {
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+  color: rgb(60, 60, 60);
+}
+
+.page-container a {
+  color: var(--primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.page-container a:hover {
+  text-decoration: none;
 }

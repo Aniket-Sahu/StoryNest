@@ -3,11 +3,14 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner';
 import api from '../api/axios';
+import StoryCard from '../components/StoryCard';
 
 const StoryPage = () => {
   const { storyId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [authorStories, setAuthorStories] = useState([]);
   const [story, setStory] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,37 +20,61 @@ const StoryPage = () => {
 
   useEffect(() => {
     fetchStoryData();
-  }, [storyId]);
+  }, [storyId, user]); // refetch story and rating if user changes
+
+  useEffect(() => {
+    if (story?.author) {
+      fetchAuthorStories(story.author.id, story.id);
+    }
+  }, [story]);
+
+  const fetchAuthorStories = async (authorId, currentStoryId) => {
+    try {
+      const res = await api.get(`/stories/user/${authorId}`);
+      setAuthorStories(res.data.filter(s => s.id !== currentStoryId));
+    } catch {
+      setAuthorStories([]);
+    }
+  };
+
+  const fetchUserRating = async (storyId, userId) => {
+    try {
+      const res = await api.get(`/stories/${storyId}/ratings`, { params: { userId } });
+      if (res.status === 204) { // no rating found
+        setRating(0);
+      } else {
+        setRating(res.data.rating);
+      }
+    } catch {
+      setRating(0);
+    }
+  };
 
   const fetchStoryData = async () => {
     try {
       setLoading(true);
       const response = await api.get(`/stories/${storyId}`);
       const storyData = response.data;
-
       setStory(storyData);
       setChapters(storyData.chapters || []);
 
-      // Check if user has liked this story
       if (user) {
-        try {
-          const likeRes = await api.get(`/stories/${storyId}/like`, {
-            params: { userId: user.id }
-          });
-          setIsLiked(likeRes.data.liked);
-        } catch (error) {
-          setIsLiked(false);
-        }
+        // Fetch user's rating for this story
+        await fetchUserRating(storyId, user.id);
 
+        // Check if user liked this story
+        const likeRes = await api.get(`/stories/${storyId}/like`, { params: { userId: user.id } });
+        setIsLiked(likeRes.data.liked);
+
+        // Check if user is following the author
         if (storyData.author?.id !== user.id) {
-          try {
-            const followRes = await api.get(`/users/${user.id}/following`);
-            const isFollowing = followRes.data.some(f => f.id === storyData.author?.id);
-            setIsFollowingAuthor(isFollowing);
-          } catch (error) {
-            setIsFollowingAuthor(false);
-          }
+          const followRes = await api.get(`/users/${user.id}/following`);
+          setIsFollowingAuthor(followRes.data.some(f => f.id === storyData.author?.id));
         }
+      } else {
+        setRating(0); // reset rating if no user
+        setIsLiked(false);
+        setIsFollowingAuthor(false);
       }
     } catch (error) {
       console.error('Failed to fetch story:', error);
@@ -61,16 +88,16 @@ const StoryPage = () => {
 
     try {
       if (isLiked) {
-        await api.delete(`/stories/${story.id}/like/`, { params: { userId: user.id } });
+        await api.delete(`/stories/${story.id}/like`, { params: { userId: user.id } });
         setIsLiked(false);
         setStory(prev => ({ ...prev, likeCount: prev.likeCount - 1 }));
       } else {
-        await api.post(`/stories/${story.id}/like`, { params: { userId: user.id } });
+        await api.post(`/stories/${story.id}/like`, {}, { params: { userId: user.id } });
         setIsLiked(true);
         setStory(prev => ({ ...prev, likeCount: prev.likeCount + 1 }));
       }
-    } catch (error) {
-      console.error('Failed to toggle like:', error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -94,12 +121,8 @@ const StoryPage = () => {
     if (!user || !story) return;
 
     try {
-      await api.post(`/stories/${story.id}/ratings`, {
-        userId: user.id,
-        rating: newRating
-      });
+      await api.post(`/stories/${story.id}/ratings`, {}, { params: { userId: user.id, rating: newRating } });
       setRating(newRating);
-      // Optionally refetch story to get updated average rating
     } catch (error) {
       console.error('Failed to rate story:', error);
     }
@@ -111,13 +134,8 @@ const StoryPage = () => {
     return num?.toString() || '0';
   };
 
-  if (loading) {
-    return <LoadingSpinner size="large" />;
-  }
-
-  if (!story) {
-    return <div className="story-not-found">Story not found</div>;
-  }
+  if (loading) return <LoadingSpinner size="large" />;
+  if (!story) return <div className="story-not-found">Story not found</div>;
 
   const isAuthor = user?.id === story.author?.id;
 
@@ -126,9 +144,7 @@ const StoryPage = () => {
       <div className="story-container">
         {/* Story Header */}
         <div className="story-header">
-          <div className="story-cover-large">
-            {story.title.charAt(0)}
-          </div>
+          <div className="story-cover-large">{story.title.charAt(0)}</div>
 
           <div className="story-info">
             <div className="story-breadcrumb">
@@ -139,18 +155,12 @@ const StoryPage = () => {
 
             <div className="story-author-info">
               <span>by </span>
-              <Link
-                to={`/profile/${story.author?.username}`}
-                className="author-link"
-              >
+              <Link to={`/profile/${story.author?.id}`} className="author-link">
                 {story.author?.username}
               </Link>
 
               {!isAuthor && (
-                <button
-                  className={`follow-btn ${isFollowingAuthor ? 'following' : 'follow'}`}
-                  onClick={handleFollowAuthor}
-                >
+                <button className={`follow-btn ${isFollowingAuthor ? 'following' : 'follow'}`} onClick={handleFollowAuthor}>
                   {isFollowingAuthor ? 'Following' : 'Follow'}
                 </button>
               )}
@@ -181,23 +191,14 @@ const StoryPage = () => {
             </div>
 
             <div className="story-actions">
-              <button
-                className={`like-btn ${isLiked ? 'liked' : ''}`}
-                onClick={handleLike}
-                disabled={!user}
-              >
+              <button className={`like-btn ${isLiked ? 'liked' : ''}`} onClick={handleLike} disabled={!user}>
                 {isLiked ? '❤️ Liked' : '🤍 Like'}
               </button>
 
-              <button className="add-to-library-btn">
-                📚 Add to Library
-              </button>
+              <button className="add-to-library-btn">📚 Add to Library</button>
 
               {chapters.length > 0 && (
-                <Link
-                  to={`/story/${story.id}/chapter/1`}
-                  className="btn btn-primary start-reading-btn"
-                >
+                <Link to={`/story/${story.id}/chapter/1`} className="btn btn-primary start-reading-btn">
                   🔖 Start Reading
                 </Link>
               )}
@@ -216,7 +217,7 @@ const StoryPage = () => {
           <div className="rating-section">
             <h3>Rate this story</h3>
             <div className="star-rating">
-              {[1, 2, 3, 4, 5].map((star) => (
+              {[1, 2, 3, 4, 5].map(star => (
                 <button
                   key={star}
                   className={`star ${star <= rating ? 'filled' : ''}`}
@@ -242,26 +243,21 @@ const StoryPage = () => {
 
           <div className="chapters-list">
             {chapters.length > 0 ? (
-              chapters.map((chapter) => (
+              chapters.map(chapter => (
                 <div key={chapter.id} className="chapter-item">
-                  <Link
-                    to={`/story/${story.id}/chapter/${chapter.number}`}
-                    className="chapter-link"
-                  >
+                  <Link to={`/story/${story.id}/chapter/${chapter.number}`} className="chapter-link">
                     <div className="chapter-info">
-                      <h4>Chapter {chapter.number}: {chapter.title}</h4>
-                      <p className="chapter-date">
-                        {new Date(chapter.createdAt).toLocaleDateString()}
-                      </p>
+                      <h4>
+                        Chapter {chapter.number}: {chapter.title}
+                      </h4>
+                      <p className="chapter-date">{new Date(chapter.createdAt).toLocaleDateString()}</p>
                     </div>
                     <div className="chapter-arrow">→</div>
                   </Link>
                 </div>
               ))
             ) : (
-              <div className="no-chapters">
-                {isAuthor ? "You haven't added any chapters yet." : "No chapters available yet."}
-              </div>
+              <div className="no-chapters">{isAuthor ? "You haven't added any chapters yet." : 'No chapters available yet.'}</div>
             )}
           </div>
         </div>
@@ -271,8 +267,11 @@ const StoryPage = () => {
           <div className="author-works">
             <h3>More from {story.author.username}</h3>
             <div className="author-stories">
-              {/* This would be populated with other stories from the same author */}
-              <p>Loading other works...</p>
+              {authorStories.length === 0 ? (
+                <p>No other works found.</p>
+              ) : (
+                authorStories.map(work => <StoryCard key={work.id} story={work} showAuthor={false} />)
+              )}
             </div>
           </div>
         )}

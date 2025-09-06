@@ -230,11 +230,11 @@
 
 .story-result h4, .user-result h4 {
   margin-bottom: var(--spacing-xs);
-  color: var(--text-primary);
+  color: black;
 }
 
 .story-result p, .user-result p {
-  color: var(--text-secondary);
+  color: gray;
   font-size: var(--font-size-sm);
   margin-bottom: var(--spacing-xs);
 }

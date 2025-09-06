@@ -22,7 +22,7 @@ const Header = () => {
           </Link>
 
           <nav className="nav-links">
-            <Link to="/dashboard" className="nav-link">Stories</Link>
+            <Link to="/stories" className="nav-link">Stories</Link>
             <Link to="/my-reads" className="nav-link">My Reads</Link>
             <Link to="/settings" className="nav-link">Settings</Link>
           </nav>

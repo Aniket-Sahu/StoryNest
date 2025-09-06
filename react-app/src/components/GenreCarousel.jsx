@@ -17,7 +17,7 @@ const GenreCarousel = () => {
   const navigate = useNavigate();
 
   const handleGenreClick = (genreName) => {
-    navigate(`/stories/genre/${genreName.toLowerCase()}`);
+    navigate(`/stories/genre/${genreName}`);
   };
 
   return (

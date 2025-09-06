@@ -5,6 +5,22 @@
   box-sizing: border-box;
 }
 
+html, body, #root, .App {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1; /* grow to fill available space */
+}
+
 /* CSS Variables */
 :root {
   /* Colors */

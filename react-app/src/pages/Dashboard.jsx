@@ -66,7 +66,7 @@ const Dashboard = () => {
           <Link to="/create-story" className="btn btn-primary">
             ✍️ Write a Story
           </Link>
-          <Link to="/dashboard" className="btn btn-outline">
+          <Link to="/stories" className="btn btn-outline">
             🔍 Browse Stories
           </Link>
         </div>
