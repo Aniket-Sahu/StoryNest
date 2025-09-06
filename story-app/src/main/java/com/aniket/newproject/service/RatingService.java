@@ -34,4 +34,8 @@ public class RatingService {
         story.setRatingAvg((float) avg);
         storyRepository.save(story);
     }
+
+    public Rating getRatingByUserAndStory(UUID userId, UUID storyId) {
+        return ratingRepository.findByUserIdAndStoryId(userId, storyId).orElse(null);
+    }
 }

@@ -741,6 +741,7 @@
 }
 
 .nav-btn {
+  color:#444;
   padding: var(--spacing-md) var(--spacing-lg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);

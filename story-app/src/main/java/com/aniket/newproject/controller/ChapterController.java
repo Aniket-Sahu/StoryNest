@@ -1,5 +1,6 @@
 package com.aniket.newproject.controller;
 
+import com.aniket.newproject.dto.ChapterRequest;
 import com.aniket.newproject.model.Chapter;
 import com.aniket.newproject.service.ChapterService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,31 @@ public class ChapterController {
             @PathVariable UUID storyId,
             @PathVariable int chapterNumber) {
         return ResponseEntity.ok(chapterService.getChapterByNumber(storyId, chapterNumber));
+    }
+
+    @PostMapping("/chapters")
+    public ResponseEntity<Chapter> createChapter(
+            @PathVariable UUID storyId,
+            @RequestBody ChapterRequest request) {
+        Chapter chapter = chapterService.createChapter(storyId, request);
+        return ResponseEntity.ok(chapter);
+    }
+
+    @PutMapping("/chapters/{chapterId}")
+    public ResponseEntity<Chapter> updateChapter(
+            @PathVariable UUID storyId,
+            @PathVariable UUID chapterId,
+            @RequestBody ChapterRequest request) {
+        Chapter chapter = chapterService.updateChapter(storyId, chapterId, request);
+        return ResponseEntity.ok(chapter);
+    }
+
+    @DeleteMapping("/chapters/{chapterId}")
+    public ResponseEntity<Void> deleteChapter(
+            @PathVariable UUID storyId,
+            @PathVariable UUID chapterId) {
+        chapterService.deleteChapter(storyId, chapterId);
+        return ResponseEntity.ok().build();
     }
 }
 

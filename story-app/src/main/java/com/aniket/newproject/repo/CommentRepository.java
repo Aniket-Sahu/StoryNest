@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
     List<Comment> findByChapter(Chapter chapter);
+    List<Comment> findByChapterAndParentCommentIsNullOrderByCreatedAtAsc(Chapter chapter);
 }

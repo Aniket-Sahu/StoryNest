@@ -51,11 +51,6 @@ public class StoryController {
         return ResponseEntity.ok(storyService.getStoriesByGenre(genreName));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Story>> searchStories(@RequestParam String query) {
-        return ResponseEntity.ok(storyService.searchStories(query));
-    }
-
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Story>> getByUser(@PathVariable UUID userId) {
         return ResponseEntity.ok(storyService.getStoriesByUser(userId));

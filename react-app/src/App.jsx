@@ -9,6 +9,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import StoryPage from './pages/StoryPage';
 import CreateStory from './pages/CreateStory';
+import NewChapter from './pages/NewChapter';          // new chapter creation page
+import ChapterReader from './pages/ChapterReader'; // chapter reading + comments
 import MyReads from './pages/MyReads';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
@@ -27,7 +29,7 @@ function App() {
     <div className="App">
       {user && <Header />}
       <div className="main-content">
-        <Routes>  
+        <Routes>
           <Route path="/" element={user ? <Dashboard /> : <LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -46,6 +48,22 @@ function App() {
             element={
               <RequireAuthReady>
                 <StoryPage />
+              </RequireAuthReady>
+            }
+          />
+          <Route
+            path="/story/:storyId/new-chapter"
+            element={
+              <RequireAuthReady>
+                <NewChapter />
+              </RequireAuthReady>
+            }
+          />
+          <Route
+            path="/story/:storyId/chapter/:chapterNumber"
+            element={
+              <RequireAuthReady>
+                <ChapterReader />
               </RequireAuthReady>
             }
           />
@@ -89,17 +107,21 @@ function App() {
               </RequireAuthReady>
             }
           />
-          <Route path="/stories/genre/:genreName" element={
-            <RequireAuthReady>
-              <GenrePage />
-            </RequireAuthReady>
-          }
+          <Route
+            path="/stories/genre/:genreName"
+            element={
+              <RequireAuthReady>
+                <GenrePage />
+              </RequireAuthReady>
+            }
           />
-          <Route path="/stories" element={
-            <RequireAuthReady>
-              <Stories />
-            </RequireAuthReady>
-          }
+          <Route
+            path="/stories"
+            element={
+              <RequireAuthReady>
+                <Stories />
+              </RequireAuthReady>
+            }
           />
           <Route path="/about" element={<About />} />
           <Route path="/terms" element={<Terms />} />
