@@ -2605,3 +2605,285 @@ input:checked + .toggle-slider::before {
         grid-template-columns: 1fr;
     }
 }
+
+.story-page .reading-status-section {
+  margin-bottom: 2rem;
+}
+
+.story-page .reading-status-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.story-page .status-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  background: white;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 200px;
+  transition: border-color 0.2s ease;
+}
+
+.story-page .status-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.story-page .status-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Progress Section */
+.story-page .progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.story-page .progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.story-page .progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.story-page .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Enhanced Chapter Items */
+.story-page .chapter-item.current {
+  border-color: #667eea;
+  background: #f7fafc;
+}
+
+.story-page .chapter-item.current .chapter-number {
+  background: #667eea;
+  color: white;
+}
+
+.story-page .current-indicator {
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* ===== MyReads Page Enhanced Styles ===== */
+
+/* Page Header */
+.my-reads-page .page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.my-reads-page .page-subtitle {
+  color: #718096;
+  font-size: 1.2rem;
+}
+
+/* Reading Stats Enhanced */
+.my-reads-page .reading-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.my-reads-page .stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.my-reads-page .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.my-reads-page .stat-label {
+  color: #4a5568;
+  font-weight: 500;
+}
+
+/* Enhanced Library Story Card */
+.my-reads-page .library-story-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.my-reads-page .library-story-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Reading Progress in Cards */
+.my-reads-page .reading-progress {
+  padding: 0.75rem 1rem;
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.my-reads-page .last-read {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: #718096;
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Story Actions in MyReads */
+.my-reads-page .story-actions {
+  padding: 1rem;
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.my-reads-page .status-controls {
+  flex: 1;
+}
+
+.my-reads-page .status-select-small {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  width: 100%;
+  max-width: 160px;
+}
+
+.my-reads-page .status-select-small:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.my-reads-page .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.my-reads-page .btn-primary-small {
+  padding: 0.5rem 1rem;
+  background: #667eea;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.my-reads-page .btn-primary-small:hover {
+  background: #5a67d8;
+  transform: translateY(-1px);
+  color: white;
+  text-decoration: none;
+}
+
+.my-reads-page .btn-remove {
+  padding: 0.5rem;
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.my-reads-page .btn-remove:hover {
+  background: #fed7d7;
+  border-color: #feb2b2;
+}
+
+/* Enhanced Empty State */
+.my-reads-page .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.my-reads-page .empty-state h3 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.my-reads-page .empty-state p {
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+/* ===== Responsive Enhancements ===== */
+
+@media (max-width: 768px) {
+  .story-page .status-select {
+    min-width: 180px;
+  }
+  
+  .my-reads-page .reading-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .my-reads-page .story-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .my-reads-page .action-buttons {
+    justify-content: space-between;
+  }
+  
+  .my-reads-page .status-select-small {
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-reads-page .reading-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .my-reads-page .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .my-reads-page .page-title {
+    font-size: 1.75rem;
+  }
+}

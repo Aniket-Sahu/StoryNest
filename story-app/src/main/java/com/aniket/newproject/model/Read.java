@@ -3,11 +3,6 @@ package com.aniket.newproject.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import com.aniket.newproject.model.ReadId;
-import com.aniket.newproject.model.User;
-import com.aniket.newproject.model.Story;
-import com.aniket.newproject.model.Chapter;
-import com.aniket.newproject.model.ReadStatus;
 
 @Entity
 @Data

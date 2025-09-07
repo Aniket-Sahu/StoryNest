@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -18,15 +18,35 @@ const StoryPage = () => {
     const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
     const [rating, setRating] = useState(0);
 
-    useEffect(() => {
-        fetchStoryData();
-    }, [storyId, user]);
+    // Reading status and progress states
+    const [readingStatus, setReadingStatus] = useState(null);
+    const [readingData, setReadingData] = useState(null);
+    const [statusLoading, setStatusLoading] = useState(false);
 
     useEffect(() => {
         if (story?.author) {
             fetchAuthorStories(story.author.id, story.id);
         }
     }, [story]);
+
+    // Fetch user's reading status for this story
+    const fetchReadingStatus = async () => {
+        if (!user) return;
+
+        try {
+            const response = await api.get(`/reads/user/${user.id}/story/${storyId}`);
+            if (response.status === 200) {
+                setReadingData(response.data);
+                setReadingStatus(response.data.status);
+            }
+        } catch (error) {
+            if (error.response?.status !== 204) {
+                console.error('Failed to fetch reading status:', error);
+            }
+            setReadingData(null);
+            setReadingStatus(null);
+        }
+    };
 
     const fetchAuthorStories = async (authorId, currentStoryId) => {
         try {
@@ -50,7 +70,7 @@ const StoryPage = () => {
         }
     };
 
-    const fetchStoryData = async () => {
+    const fetchStoryData = useCallback(async () => {
         try {
             setLoading(true);
             const response = await api.get(`/stories/${storyId}`);
@@ -60,6 +80,7 @@ const StoryPage = () => {
 
             if (user) {
                 await fetchUserRating(storyId, user.id);
+                await fetchReadingStatus();
 
                 const likeRes = await api.get(`/stories/${storyId}/like`, { params: { userId: user.id } });
                 setIsLiked(likeRes.data.liked);
@@ -77,6 +98,68 @@ const StoryPage = () => {
             console.error('Failed to fetch story:', error);
         } finally {
             setLoading(false);
+        }
+    }, [storyId, user]);
+
+    useEffect(() => {
+        fetchStoryData();
+    }, [storyId, user, fetchStoryData]);
+
+    const handleStatusChange = async (newStatus) => {
+        if (!user || statusLoading) return;
+
+        setStatusLoading(true);
+        try {
+            await api.post('/reads/status', null, {
+                params: {
+                    userId: user.id,
+                    storyId: storyId,
+                    status: newStatus
+                }
+            });
+            setReadingStatus(newStatus);
+            await fetchReadingStatus(); // Refresh reading data
+        } catch (error) {
+            console.error('Failed to update reading status:', error);
+        } finally {
+            setStatusLoading(false);
+        }
+    };
+
+    const handleChapterClick = async (chapterNumber) => {
+        try {
+            await api.post('/reads/progress', null, {
+                params: {
+                    userId: user.id,
+                    storyId: storyId,
+                    chapterNumber: chapterNumber
+                }
+            });
+            navigate(`/story/${storyId}/chapter/${chapterNumber}`);
+        } catch (error) {
+            console.error('Failed to update reading progress:', error);
+            navigate(`/story/${storyId}/chapter/${chapterNumber}`);
+        }
+    };
+
+    const handleContinueReading = async () => {
+        if (!user || chapters.length === 0) return;
+
+        const targetChapter = readingData?.currentChapter || 1;
+
+        try {
+            await api.post('/reads/progress', null, {
+                params: {
+                    userId: user.id,
+                    storyId: storyId,
+                    chapterNumber: targetChapter
+                }
+            });
+
+            navigate(`/story/${storyId}/chapter/${targetChapter}`);
+        } catch (error) {
+            console.error('Failed to update reading progress:', error);
+            navigate(`/story/${storyId}/chapter/${targetChapter}`);
         }
     };
 
@@ -131,10 +214,22 @@ const StoryPage = () => {
         return num?.toString() || '0';
     };
 
+    const getStatusOptions = () => [
+        { value: 'WANT_TO_READ', label: '📚 Want to Read' },
+        { value: 'READING', label: '📖 Reading' },
+        { value: 'COMPLETED', label: '✅ Completed' }
+    ];
+
+    const calculateProgress = () => {
+        if (!readingData || !chapters.length) return 0;
+        return Math.round((readingData.currentChapter / chapters.length) * 100);
+    };
+
     if (loading) return <LoadingSpinner />;
     if (!story) return <div>Story not found</div>;
 
     const isAuthor = user?.id === story.author?.id;
+    const progress = calculateProgress();
 
     return (
         <div className="story-page">
@@ -190,9 +285,9 @@ const StoryPage = () => {
 
                             <div className="story-actions">
                                 {chapters.length > 0 && (
-                                    <Link to={`/story/${storyId}/chapter/1`} className="btn-primary">
-                                        🔖 Start Reading
-                                    </Link>
+                                    <button onClick={handleContinueReading} className="btn-primary">
+                                        🔖 {readingData?.currentChapter ? `Continue Reading (Ch. ${readingData.currentChapter})` : 'Start Reading'}
+                                    </button>
                                 )}
                                 {isAuthor && (
                                     <Link to={`/story/${storyId}/new-chapter`} className="btn-secondary">
@@ -203,6 +298,49 @@ const StoryPage = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Reading Status and Progress */}
+                {user && !isAuthor && (
+                    <div className="reading-status-section">
+                        <div className="section-card">
+                            <h3 className="reading-status-title">Your Reading Status</h3>
+                            <div className="reading-status-controls">
+                                <div className="status-dropdown">
+                                    <select
+                                        value={readingStatus || ''}
+                                        onChange={(e) => handleStatusChange(e.target.value)}
+                                        disabled={statusLoading}
+                                        className="status-select"
+                                    >
+                                        <option value="">Select Status</option>
+                                        {getStatusOptions().map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {chapters.length > 0 && (
+                                    <div className="progress-section">
+                                        <div className="progress-info">
+                                            <span>
+                                                Chapter {readingData?.currentChapter > 0 ? readingData.currentChapter : 0} of {chapters.length}
+                                            </span>
+                                            <span>{progress || 0}% complete</span>
+                                        </div>
+                                        <div className="progress-bar">
+                                            <div
+                                                className="progress-fill"
+                                                style={{ width: `${progress || 0}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Story Description */}
                 <div className="story-description">
@@ -247,10 +385,10 @@ const StoryPage = () => {
                         <div className="chapters-list">
                             {chapters.length > 0 ? (
                                 chapters.map(chapter => (
-                                    <Link
+                                    <button
                                         key={chapter.id}
-                                        to={`/story/${storyId}/chapter/${chapter.number}`}
-                                        className="chapter-item"
+                                        onClick={() => handleChapterClick(chapter.number)}
+                                        className={`chapter-item ${readingData?.currentChapter === chapter.number ? 'current' : ''}`}
                                     >
                                         <div className="chapter-info">
                                             <div className="chapter-number">
@@ -262,15 +400,16 @@ const StoryPage = () => {
                                             </div>
                                         </div>
                                         <div className="chapter-arrow">
+                                            {readingData?.currentChapter === chapter.number && <span className="current-indicator">📍</span>}
                                             →
                                         </div>
-                                    </Link>
+                                    </button>
                                 ))
                             ) : (
                                 <div className="no-chapters">
                                     {isAuthor ? "You haven't added any chapters yet." : 'No chapters available yet.'}
                                     {isAuthor && (
-                                        <Link to={`/story/${storyId}/new-chapter`} className="btn-primary" style={{marginTop: '1rem'}}>
+                                        <Link to={`/story/${storyId}/new-chapter`} className="btn-primary" style={{ marginTop: '1rem' }}>
                                             Write Your First Chapter
                                         </Link>
                                     )}
