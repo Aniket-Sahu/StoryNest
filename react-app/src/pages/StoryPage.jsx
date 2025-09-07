@@ -222,7 +222,7 @@ const StoryPage = () => {
                                     <button
                                         key={star}
                                         onClick={() => handleRating(star)}
-                                        className={`star ${rating >= star ? 'active' : ''}`}
+                                        className={`star ${rating >= star ? 'filled' : ''}`}
                                     >
                                         ⭐
                                     </button>

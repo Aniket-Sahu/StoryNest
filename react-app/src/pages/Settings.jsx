@@ -41,7 +41,6 @@ const Settings = () => {
     try {
       // Save to localStorage (in a real app, you'd save to backend)
       localStorage.setItem(`settings_${user.id}`, JSON.stringify(settings));
-      
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
@@ -233,7 +232,7 @@ const Settings = () => {
                 </div>
                 <button
                   className="btn btn-outline"
-                  onClick={() => navigate('/profile')}
+                  onClick={() => navigate(`/profile/${user?.id}?edit=true`)}
                 >
                   Edit Profile
                 </button>

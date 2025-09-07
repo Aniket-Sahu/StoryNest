@@ -31,19 +31,16 @@ public class Read {
 
     @Enumerated(EnumType.STRING)
     private ReadStatus status;
-
-    private Integer currentChapter; // Added field
-
-    private Integer progress; // percentage from 0 to 100 -- Added field
-
-    private LocalDateTime lastReadAt; // Added field
+    private Integer currentChapter;
+    private Integer progress;
+    private LocalDateTime lastReadAt;
 
     private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         updatedAt = LocalDateTime.now();
-        lastReadAt = updatedAt; // initialize lastReadAt when created
+        lastReadAt = updatedAt;
     }
 
     @PreUpdate

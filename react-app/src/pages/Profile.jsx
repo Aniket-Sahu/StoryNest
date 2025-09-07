@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import UserProfile from '../components/UserProfile';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -9,7 +9,9 @@ const Profile = () => {
   const { username } = useParams();
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
+  const [searchParams] = useSearchParams();
+  const editing = searchParams.get("edit") === "true";
+  const [isEditing, setIsEditing] = useState(editing);
   const [editData, setEditData] = useState({
     username: '',
     email: '',

@@ -91,7 +91,6 @@ const CreateStory = () => {
             const response = await api.post('/stories', storyData);
             const newStory = response.data;
 
-            // Show success message and navigate to add first chapter
             const shouldAddChapter = window.confirm(
                 '🎉 Story created successfully! Would you like to add your first chapter now?'
             );

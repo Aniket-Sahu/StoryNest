@@ -16,7 +16,6 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Footer from './components/Footer';
 import GenrePage from './pages/GenrePage';
-import Stories from './pages/Stories';
 import Notifications from './pages/Notifications';
 import About from './pages/About';
 import Terms from './pages/Terms';
@@ -112,14 +111,6 @@ function App() {
             element={
               <RequireAuthReady>
                 <GenrePage />
-              </RequireAuthReady>
-            }
-          />
-          <Route
-            path="/stories"
-            element={
-              <RequireAuthReady>
-                <Stories />
               </RequireAuthReady>
             }
           />

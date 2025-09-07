@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider mounted');
     const token = localStorage.getItem("authToken");
     const storedUser = localStorage.getItem("userData");
     
@@ -18,7 +17,6 @@ export const AuthProvider = ({ children }) => {
         setUser(parsedUser);
         // Set default authorization header
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        console.log('User restored from storage:', parsedUser);
       } catch (e) {
         console.error("Failed to parse stored user:", e);
         localStorage.removeItem("userData");
@@ -32,10 +30,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      console.log("Attempting login...");
       const response = await api.post("/users/login", credentials);
-      console.log("Login response:", response.data);
-
       const { token, user: userData } = response.data;
 
       // Store token and user data
@@ -46,7 +41,6 @@ export const AuthProvider = ({ children }) => {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       setUser(userData);
-      console.log("User set:", userData);
       return { success: true };
     } catch (error) {
       console.error("Login error:", error);
@@ -59,7 +53,6 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      console.log("Attempting registration...");
       const response = await api.post("/users/register", userData);
       
       const { token, user: newUser } = response.data;

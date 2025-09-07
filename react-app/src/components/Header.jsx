@@ -7,7 +7,7 @@ const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -22,7 +22,7 @@ const Header = () => {
           </Link>
 
           <nav className="nav-links">
-            <Link to="/stories" className="nav-link">Stories</Link>
+            <Link to="/dashboard" className="nav-link">Stories</Link>
             <Link to="/my-reads" className="nav-link">My Reads</Link>
             <Link to="/settings" className="nav-link">Settings</Link>
           </nav>
@@ -54,7 +54,7 @@ const Header = () => {
                 <Link to={`/profile/${user?.id}`} className="dropdown-item">
                   View Profile
                 </Link>
-                <Link to="/profile/edit" className="dropdown-item">
+                <Link to={`/profile/${user?.id}?edit=true`} className="dropdown-item">
                   Edit Profile
                 </Link>
                 <Link to="/create-story" className="dropdown-item">

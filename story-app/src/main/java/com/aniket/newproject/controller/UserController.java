@@ -99,6 +99,25 @@ public class UserController {
         return ResponseEntity.ok(userService.findByUsername(username));
     }
 
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable UUID userId, @RequestBody User updatedUser) {
+        try {
+            User existingUser = userService.findById(userId);
+            if (existingUser == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            existingUser.setUsername(updatedUser.getUsername());
+            existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setBio(updatedUser.getBio());
+
+            User savedUser = userService.updateUser(existingUser);
+            return ResponseEntity.ok(savedUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to update user: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/{followerId}/follow/{followeeId}")
     public ResponseEntity<String> followUser(
             @PathVariable UUID followerId,
