@@ -4,6 +4,7 @@ import com.aniket.newproject.dto.JwtResponse;
 import com.aniket.newproject.dto.LoginRequest;
 import com.aniket.newproject.dto.RegisterRequest;
 import com.aniket.newproject.config.JwtUtils;
+import com.aniket.newproject.model.Like;
 import com.aniket.newproject.model.Read;
 import com.aniket.newproject.model.Story;
 import com.aniket.newproject.model.User;
@@ -37,6 +38,12 @@ public class UserController {
     @GetMapping("/id/{userId}")
     public ResponseEntity<User> getByUserId(@PathVariable UUID userId) {
         return ResponseEntity.ok(userService.findById(userId));
+    }
+
+    @GetMapping("/{userId}/likes")
+    public ResponseEntity<List<Story>> getLikes(@PathVariable UUID userId) {
+        List<Story> likedStories = userService.getLikedStoriesForUser(userId);
+        return ResponseEntity.ok(likedStories);
     }
 
     @PostMapping("/login")
@@ -173,10 +180,5 @@ public class UserController {
             @PathVariable UUID storyId) {
         userService.removeFromReads(userId, storyId);
         return ResponseEntity.ok("Removed from reading list");
-    }
-
-    @GetMapping("/{userId}/likes")
-    public ResponseEntity<List<Story>> getUserLikedStories(@PathVariable UUID userId) {
-        return ResponseEntity.ok(userService.getUserLikedStories(userId));
     }
 }

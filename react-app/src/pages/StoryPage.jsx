@@ -110,6 +110,7 @@ const StoryPage = () => {
 
         setStatusLoading(true);
         try {
+            console.log('With params:', { userId: user.id, storyId: storyId, status: newStatus });
             await api.post('/reads/status', null, {
                 params: {
                     userId: user.id,

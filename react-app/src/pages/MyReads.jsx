@@ -21,27 +21,39 @@ const MyReads = () => {
     const fetchMyReads = useCallback(async () => {
         try {
             setLoading(true);
-            setError('');
+            setError("");
 
+            // Fetch reading statuses (excluding liked)
             const response = await api.get(`/reads/user/${user.id}`);
             const readingData = response.data || [];
 
-            // Organize readings by status
+            // Fetch liked stories separately
+            const likedResponse = await api.get(`/users/${user.id}/likes`);
+            const likedStories = likedResponse.data || [];
+
+            // Organize readings by status (excluding liked)
             const organizedReadings = {
-                reading: readingData.filter(r => r.status === 'READING'),
-                completed: readingData.filter(r => r.status === 'COMPLETED'),
-                wantToRead: readingData.filter(r => r.status === 'WANT_TO_READ'),
-                liked: readingData.filter(r => r.status === 'LIKED'),
+                reading: readingData.filter((r) => r.status === "READING"),
+                completed: readingData.filter((r) => r.status === "COMPLETED"),
+                wantToRead: readingData.filter((r) => r.status === "WANT_TO_READ"),
+                liked: likedStories.map(story => ({
+                    story,
+                    // Add dummy or default values for other reading fields that UI expects
+                    currentChapter: 0,
+                    status: "",
+                    lastReadAt: null,
+                })),
             };
 
             setReadings(organizedReadings);
         } catch (error) {
-            console.error('Failed to fetch reading data:', error);
-            setError('Failed to load your reading list. Please try again.');
+            console.error("Failed to fetch reading data:", error);
+            setError("Failed to load your reading list. Please try again.");
         } finally {
             setLoading(false);
         }
     }, [user]);
+
 
     useEffect(() => {
         if (!authLoading && user) {
@@ -60,7 +72,7 @@ const MyReads = () => {
                     status: newStatus
                 }
             });
-            
+
             // Refresh the reading list
             await fetchMyReads();
         } catch (error) {
@@ -77,7 +89,7 @@ const MyReads = () => {
 
         try {
             await api.delete(`/reads/user/${user.id}/story/${storyId}`);
-            
+
             // Refresh the reading list
             await fetchMyReads();
         } catch (error) {
@@ -96,7 +108,7 @@ const MyReads = () => {
         const now = new Date();
         const diffTime = Math.abs(now - date);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays === 1) return 'Yesterday';
         if (diffDays <= 7) return `${diffDays} days ago`;
         return date.toLocaleDateString();
@@ -192,7 +204,7 @@ const MyReads = () => {
                                 return (
                                     <div key={story.id} className="library-story-card">
                                         <StoryCard story={story} />
-                                        
+
                                         {/* Reading Progress */}
                                         {read.currentChapter > 0 && (
                                             <div className="reading-progress">
@@ -201,8 +213,8 @@ const MyReads = () => {
                                                     <span>{progress}% complete</span>
                                                 </div>
                                                 <div className="progress-bar">
-                                                    <div 
-                                                        className="progress-fill" 
+                                                    <div
+                                                        className="progress-fill"
                                                         style={{ width: `${progress}%` }}
                                                     ></div>
                                                 </div>
@@ -234,21 +246,21 @@ const MyReads = () => {
 
                                             <div className="action-buttons">
                                                 {read.currentChapter > 0 ? (
-                                                    <Link 
+                                                    <Link
                                                         to={`/story/${story.id}/chapter/${read.currentChapter}`}
                                                         className="btn-primary-small"
                                                     >
                                                         Continue
                                                     </Link>
                                                 ) : (
-                                                    <Link 
+                                                    <Link
                                                         to={`/story/${story.id}`}
                                                         className="btn-primary-small"
                                                     >
                                                         Read
                                                     </Link>
                                                 )}
-                                                
+
                                                 <button
                                                     onClick={() => removeFromLibrary(story.id)}
                                                     className="btn-remove"

@@ -28,8 +28,6 @@ public class UserService {
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    // ========== EXISTING METHODS (UNCHANGED) ==========
-
     public User register(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
@@ -160,5 +158,12 @@ public class UserService {
 
     public Optional<User> findByEmailOptional(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public List<Story> getLikedStoriesForUser(UUID userId) {
+        List<Like> likes = likeRepository.findByIdUserId(userId);
+        return likes.stream()
+                .map(Like::getStory)
+                .collect(Collectors.toList());
     }
 }

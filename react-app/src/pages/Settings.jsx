@@ -57,9 +57,7 @@ const Settings = () => {
     const confirmed = window.confirm(
       'Are you sure you want to delete your account? This action cannot be undone.'
     );
-    
     if (confirmed) {
-      // In a real app, you'd call the delete account API
       logout();
       navigate('/');
     }

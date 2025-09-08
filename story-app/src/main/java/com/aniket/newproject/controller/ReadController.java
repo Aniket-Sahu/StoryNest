@@ -17,7 +17,6 @@ public class ReadController {
 
     private final ReadService readService;
 
-    // Add or update reading status (WANT_TO_READ, READING, COMPLETED, LIKED)
     @PostMapping("/status")
     public ResponseEntity<Read> addOrUpdateReadingStatus(
             @RequestParam UUID userId,
