@@ -31,3 +31,7 @@ Thumbs.db
 git rm -r --cached node_modules
 git rm -r --cached backend/target
 git rm -r --cached frontend/build
+
+# === Custom ===
+/public/recordings/
+
